@@ -37,8 +37,9 @@ function authenticationFailedRequest() {
 function verifyRequest() {
     $CI =& get_instance();
     $CI->input->request_headers();
-    $apikey = $CI->input->get_request_header('x-api-key');
+    $apikey = $CI->input->get_request_header('x-api-key');    
     if(empty($apikey) || !$apikey || $apikey == '') { //Check API KEY Existence
+        echo 'api key empty';
         return false;
     }
     if($apikey != '') { // IF not NULL or EMPTY

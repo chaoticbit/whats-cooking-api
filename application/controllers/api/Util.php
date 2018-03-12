@@ -2,7 +2,7 @@
 
 class Util extends CI_Controller {    
     public function getCuisines() {
-        $data = verifyRequest();
+        $data = verifyRequest();        
 		if(!$data) {
 			return authenticationFailedRequest();
 		}

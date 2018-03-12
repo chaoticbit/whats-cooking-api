@@ -28,7 +28,7 @@ class Authentication extends CI_Controller {
 		if(!verifyRequest()) {
 			return authenticationFailedRequest();
 		}
-	    return responseWithHeader(true, array('response'=>$_POST['token_id']));        
+	    return responseWithHeader(true, array('response'=>$_POST['user_id']));        
   	}
 
 	public function signup() {
