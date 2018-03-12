@@ -19,8 +19,12 @@ class Settings extends CI_Controller {
 		}
 
 		$this->load->model('Settings_model');
-		$result = $this->Settings_model->getUserProfile($data);
-		return responseWithHeader(true, $result);    		
+        $result = $this->Settings_model->getUserProfile($data);
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
 	}
 
 	public function saveUserProfile() {		

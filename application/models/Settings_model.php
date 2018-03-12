@@ -1,8 +1,12 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Settings_model extends CI_Model {
-    public function getUserProfile($srno) {
-
+    public function getUserProfile($data) {
+        $result = $this->db->query("SELECT * from userprofile where uid = " . (int)$data['user_id']);
+        if($result->num_rows() > 0) {
+            return $result->row_array();
+        }
+        return false;
     }
 
     public function saveUserProfile($data) {
