@@ -32,4 +32,29 @@ class Util extends CI_Controller {
         }
         echo json_encode(array('success'=>true, 'files'=>$total_files_uploaded));
     }
+
+    public function uploadvideo() {
+        $config['max_size'] = 0;        
+        $token = JWT::decode($_POST['token'], SECRET_SERVER_KEY);
+        $userid = $token->id;
+
+        $filename = $_FILES['file']['name'];
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $temp = explode(".", $_FILES["file"]["name"]);
+        $newfilename = rand(1, 999999) . '' . time() . '.' . end($temp);
+
+        move_uploaded_file($_FILES['file']['tmp_name'], 'userdata/' . $userid . '/' . $newfilename);
+        echo json_encode(array('success'=>true,'filename'=>'userdata/' . $userid . '/' . $newfilename));
+    }
+
+    public function removeUploadedImage() {
+        $data = verifyRequest();
+        if(!$data) {
+            return authenticationFailedRequest();
+        }
+
+        $file = $data['filename'];
+        unlink($file);
+        return responseWithHeader(true, []);    		
+    }
 }
