@@ -17,4 +17,17 @@ class Util_model extends CI_Model {
             $this->db->query("update cuisines set imagepath='cuisine_" . strtolower($result[$i]['name']) . ".jpg' where srno=" . $result[$i]['srno'] . "");
         }
     }    
+
+    public function getTags() {
+        $response = array();
+        $query = $this->db->query("SELECT tags.name FROM tags");
+        if($query->num_rows() > 0) {
+            $result = $query->result_array();
+            foreach($result as $item) {
+                $tag_result = array("name"=>$item['name'],"value"=>$item['name'],"text"=>$item['name']);
+                array_push($response, $tag_result);
+            }
+        }
+        return $response;
+    }
 }

@@ -58,6 +58,21 @@ class Util extends CI_Controller {
         return responseWithHeader(true, []);    		
     }
 
+    public function getTags() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->getTags();
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
     public function insertCuisineImages() {
         $this->load->model('Util_model');
         $result = $this->Util_model->insertCuisineImages();   
