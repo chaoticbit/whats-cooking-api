@@ -57,4 +57,9 @@ class Util extends CI_Controller {
         unlink($file);
         return responseWithHeader(true, []);    		
     }
+
+    public function insertCuisineImages() {
+        $this->load->model('Util_model');
+        $result = $this->Util_model->insertCuisineImages();   
+    }
 }

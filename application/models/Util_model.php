@@ -8,4 +8,13 @@ class Util_model extends CI_Model {
         }
         return false;
     }    
+
+    public function insertCuisineImages() {
+        $query = $this->db->query("SELECT * from cuisines");
+        $result = $query->result_array();
+        
+        for($i=0;$i<count($result);$i++) {            
+            $this->db->query("update cuisines set imagepath='cuisine_" . strtolower($result[$i]['name']) . ".jpg' where srno=" . $result[$i]['srno'] . "");
+        }
+    }    
 }
