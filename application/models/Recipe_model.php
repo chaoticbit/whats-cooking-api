@@ -12,7 +12,7 @@ class Recipe_model extends CI_Model {
             $result['spicy'] = (int)$result['spicy'];
 
             $this->db->query("INSERT into weightage(rid, timestamp) values('" . (int)$result['recipe_id'] . "','" . $result['timestamp'] . "')");                        
-            $this->db->query("INSERT into ratings(rid) values(" . (int)$result['recipe_id'] . ")");
+            
             $orig = $this->db->db_debug;
             $this->db->db_debug = FALSE;
             
