@@ -10,9 +10,9 @@ class Recipe_model extends CI_Model {
             $result['cover_imagepath'] = 'userdata/' . $data['user_id'] . '/' . $result['cover_imagepath'];
             $result['rating'] = 0;
             $result['spicy'] = (int)$result['spicy'];
-            
-            $this->db->query("INSERT into weightage(rid, timestamp) values('" . (int)$result['recipe_id'] . "','" . $result['timestamp'] . "')");            
-            
+
+            $this->db->query("INSERT into weightage(rid, timestamp) values('" . (int)$result['recipe_id'] . "','" . $result['timestamp'] . "')");                        
+            $this->db->query("INSERT into ratings(rid) values(" . (int)$result['recipe_id'] . ")");
             $orig = $this->db->db_debug;
             $this->db->db_debug = FALSE;
             
@@ -44,5 +44,19 @@ class Recipe_model extends CI_Model {
             $this->db->db_debug = $orig;
             return $result;
         }        
+    }
+
+    public function getrecipes($user_id) {
+        $user_id = (int)$user_id;
+
+        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, cuisines, ratings where recipes.uid=useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno order by timestamp DESC LIMIT 10");
+        if($query->num_rows() > 0) { 
+            $result = $query->result_array();      
+            for($i=0;$i<count($result);$i++) {
+                $result[$i]['cover_imagepath'] = 'userdata/' . $user_id . '/' . $result[$i]['cover_imagepath'];
+            }
+            return $result;      
+        }
+        return false;
     }
 }
