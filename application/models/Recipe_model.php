@@ -54,15 +54,12 @@ class Recipe_model extends CI_Model {
             $result = $query->result_array();      
             for($i=0;$i<count($result);$i++) {
                 $result[$i]['cover_imagepath'] = 'userdata/' . $user_id . '/' . $result[$i]['cover_imagepath'];
-                $query_ = $this->db->query("select uid from favourites where rid = " . (int)$result[$i]['recipe_id']);
-                $result_ = $query->result_array();     
-                for($j=0;$j<count($result_);$j++) { 
-                    if($result_[$j]['uid'] == $user_id) {
-                        $result[$i]['addedToFavourites'] = true;
-                    } else {
-                        $result[$i]['addedToFavourites'] = false;
-                    }
-                }
+                $query_ = $this->db->query("select * from favourites where rid = " . (int)$result[$i]['recipe_id'] . " and uid = " . $user_id . "");                
+                if($query_->num_rows() > 0) {
+                    $result[$i]['addedToFavourites'] = true;
+                } else {
+                    $result[$i]['addedToFavourites'] = false;
+                }                
             }
             return $result;      
         }
