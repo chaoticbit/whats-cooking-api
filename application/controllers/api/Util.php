@@ -15,6 +15,52 @@ class Util extends CI_Controller {
             return responseWithHeader(true, []);    		
         }
     }
+
+    public function getTags() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->getTags();
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
+    public function getFavourites() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->getFavourites($data['user_id']);
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
+    public function getFeaturedRecipes() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->getFeaturedRecipes();
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
     public function upload() {                        
         $token = JWT::decode($_POST['token'], SECRET_SERVER_KEY);
         $userid = $token->id;
@@ -58,23 +104,9 @@ class Util extends CI_Controller {
         return responseWithHeader(true, []);    		
     }
 
-    public function getTags() {
-        $data = verifyRequest();        
-		if(!$data) {
-			return authenticationFailedRequest();
-		}
-
-		$this->load->model('Util_model');
-        $result = $this->Util_model->getTags();
-        if($result) {    
-            return responseWithHeader(true, $result);    		
-        } else {
-            return responseWithHeader(true, []);    		
-        }
-    }
-
     public function insertCuisineImages() {
         $this->load->model('Util_model');
         $result = $this->Util_model->insertCuisineImages();   
     }
+    
 }
