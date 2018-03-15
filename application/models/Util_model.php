@@ -22,6 +22,15 @@ class Util_model extends CI_Model {
         return $response;
     }
 
+    public function addToFavourites($data) {
+        $this->db->query("insert into favourites values(" . (int)$data['rid'] . ", " . (int)$data['user_id'] . ")");
+        $query = $this->db->query("select * from favourites where rid = " . (int)$data['rid'] . " and uid = " . (int)$data['user_id'] . "");
+        if($query->num_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
+
     public function getFavourites($user_id) {
         $result = $this->db->query("SELECT recipes.srno, recipes.title, recipes.cover_imagepath, concat(useraccounts.fname,' ',useraccounts.lname), useraccounts.username from recipes, favourites, useraccounts where favourites.uid=" . (int)$user_id . " and recipes.uid=useraccounts.srno and recipes.srno=favourites.rid ");
         if($result->num_rows() > 0) {

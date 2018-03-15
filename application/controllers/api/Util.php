@@ -31,6 +31,23 @@ class Util extends CI_Controller {
         }
     }
 
+    public function addToFavourites() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->addToFavourites($data);
+        if($result) {    
+            return responseWithHeader(true, []);    		
+        } else {
+            return responseWithHeader(false, []);    		
+        }
+    }
+
+
+
     public function getFavourites() {
         $data = verifyRequest();        
 		if(!$data) {

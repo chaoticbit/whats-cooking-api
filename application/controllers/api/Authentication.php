@@ -8,7 +8,8 @@ class Authentication extends CI_Controller {
 		$result = $this->Authentication_model->validate_credentials($_POST['username'], md5($_POST['password']));        
 		
 		if($result) {
-	  		$data = array(				
+	  		$data = array(		
+                "userid" => $result['srno'],
 				"username" => $_POST['username'],
 				"fname" => $result['fname'],
 				"lname" => $result['lname'],
@@ -37,6 +38,7 @@ class Authentication extends CI_Controller {
 		$this->load->model('Authentication_model');
 		$srno = $this->Authentication_model->signup($_POST);
 		$data = array(			
+            "userid" => $srno,
 			"username" => $_POST['username'],
 			"fname" => $_POST['fname'],			
 			"lname" => $_POST['lname'],			
