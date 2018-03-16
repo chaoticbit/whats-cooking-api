@@ -38,7 +38,7 @@ class Util_model extends CI_Model {
     }
 
     public function getFavourites($user_id) {
-        $result = $this->db->query("SELECT recipes.srno, recipes.title, recipes.cover_imagepath, concat(useraccounts.fname,' ',useraccounts.lname), useraccounts.username from recipes, favourites, useraccounts where favourites.uid=" . (int)$user_id . " and recipes.uid=useraccounts.srno and recipes.srno=favourites.rid ");
+        $result = $this->db->query("SELECT recipes.srno, recipes.title, recipes.uid as recipe_owner_id, recipes.cover_imagepath, concat(useraccounts.fname,' ',useraccounts.lname) as fullname, useraccounts.username from recipes, favourites, useraccounts where favourites.uid=" . (int)$user_id . " and recipes.uid=useraccounts.srno and recipes.srno=favourites.rid ");
         if($result->num_rows() > 0) {
             return $result->result_array();
         }
