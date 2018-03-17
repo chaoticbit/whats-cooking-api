@@ -11,6 +11,10 @@ class Settings_model extends CI_Model {
 
     public function saveUserProfile($data) {
         $result = $this->db->query("INSERT into userprofile values('" . $data['city'] . "','" . $data['state'] . "','" . $data['country'] . "','" . $data['gender'] . "','" . $data['profile_imagepath'] . "','" . $data['pref_cuisine'] . "','" . $data['food_group'] . "','" . $data['spiciness'] . "','" . $data['calorie_intake'] . "', '" . (int)$data['user_id'] . "')");
+        $cuisine_array = explode(',', $data['followed_cuisines']);
+        foreach($cuisine_array as $cid) {
+            $this->db->query("insert into cuisine_user values(" . (int)$cid . "," . (int)$data['user_id'] . ")");
+        }
         return true;
     }
 }
