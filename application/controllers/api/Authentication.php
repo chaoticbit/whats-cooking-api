@@ -33,23 +33,29 @@ class Authentication extends CI_Controller {
   	}
 
 	public function signup() {
-		$_POST = processRequest();                
-		$_POST['password'] = md5($_POST['password']);
+        $_POST = processRequest();                
+        $username = $this->security->xss_clean($_POST['username']);
+        $password = $this->security->xss_clean($_POST['password']);
+        $fname = $this->security->xss_clean($_POST['fname']);
+        $lname = $this->security->xss_clean($_POST['lname']);
+        $email = $this->security->xss_clean($_POST['email']);
+
+        $password = md5($_POST['password']);        
 		$this->load->model('Authentication_model');
-		$srno = $this->Authentication_model->signup($_POST);
+		$srno = $this->Authentication_model->signup($username, $password, $fname, $lname, $email);
 		$data = array(			
             "userid" => $srno,
-			"username" => $_POST['username'],
-			"fname" => $_POST['fname'],			
-			"lname" => $_POST['lname'],			
-			"email" => $_POST['email'],
+			"username" => $username,
+			"fname" => $fname,			
+			"lname" => $lname,			
+			"email" => $email,
 			"avatarpath" => '' 			
         );
         $token = array();
         $token['id'] = $srno; 
         $data['token'] = JWT::encode($token, SECRET_SERVER_KEY);		
-		mkdir(FCPATH . "userdata/" . $this->session->userdata('userid'), 0700, true);
-		chmod(FCPATH . "userdata/" . $this->session->userdata('userid'), 0777);
+		mkdir(FCPATH . "userdata/" . $srno, 0700, true);
+		chmod(FCPATH . "userdata/" . $srno, 0777);
 		return responseWithHeader(true, $data);
 	}
 	

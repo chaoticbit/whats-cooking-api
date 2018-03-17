@@ -13,9 +13,9 @@ class Authentication_model extends CI_Model {
 		return false;
   	}
 
-  	public function signup($data) {
-		$this->db->query("INSERT into useraccounts(username, password, email, fname, lname) VALUES('" . $data['username'] . "','" . $data['password'] . "','" . $data['email'] . "','" . $data['fname'] . "','" . $data['lname'] . "')");
-		$result = $this->db->query("SELECT srno FROM useraccounts WHERE username = '" . $data['username'] . "'");
+  	public function signup($username, $password, $fname, $lname, $email) {
+		$this->db->query("INSERT into useraccounts(username, password, email, fname, lname) VALUES('$username','$password','$email','$fname','$lname')");
+		$result = $this->db->query("SELECT srno FROM useraccounts WHERE username = '$username'");
 		$row = $result->row_array();      
 		return $row['srno'];
   	}
