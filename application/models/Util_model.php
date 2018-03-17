@@ -46,7 +46,7 @@ class Util_model extends CI_Model {
     }     
 
     public function getFeaturedRecipes() {
-        $result = $this->db->query("select recipes.srno, recipes.title, concat(useraccounts.fname,' ',useraccounts.lname), useraccounts.username from recipes, useraccounts, weightage where recipes.uid=useraccounts.srno and recipes.srno=weightage.rid and DATE(recipes.timestamp) = CURDATE() ORDER BY weight DESC LIMIT 5");
+        $result = $this->db->query("select recipes.srno, recipes.title, concat(useraccounts.fname,' ',useraccounts.lname) as fullname, useraccounts.username from recipes, useraccounts, weightage where recipes.uid=useraccounts.srno and recipes.srno=weightage.rid and DATE(recipes.timestamp) = CURDATE() ORDER BY weight DESC LIMIT 5");
         if($result->num_rows() > 0) {
             return $result->result_array();
         }
