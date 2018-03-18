@@ -41,22 +41,24 @@ class Authentication extends CI_Controller {
         $email = $this->security->xss_clean($_POST['email']);
 
         $password = md5($_POST['password']);        
-		$this->load->model('Authentication_model');
-		$srno = $this->Authentication_model->signup($username, $password, $fname, $lname, $email);
-		$data = array(			
-            "userid" => $srno,
-			"username" => $username,
-			"fname" => $fname,			
-			"lname" => $lname,			
-			"email" => $email,
-			"avatarpath" => '' 			
-        );
-        $token = array();
-        $token['id'] = $srno; 
-        $data['token'] = JWT::encode($token, SECRET_SERVER_KEY);		
-		mkdir(FCPATH . "userdata/" . $srno, 0700, true);
-		chmod(FCPATH . "userdata/" . $srno, 0777);
-		return responseWithHeader(true, $data);
+        $this->load->model('Authentication_model');
+        if($username!='') {
+		    $srno = $this->Authentication_model->handle_signup($username, $password, $fname, $lname, $email);
+            $data = array(			
+                "userid" => $srno,
+                "username" => $username,
+                "fname" => $fname,			
+                "lname" => $lname,			
+                "email" => $email,
+                "avatarpath" => '' 			
+            );
+            $token = array();
+            $token['id'] = $srno; 
+            $data['token'] = JWT::encode($token, SECRET_SERVER_KEY);		
+            mkdir(FCPATH . "userdata/" . $srno, 0700, true);
+            chmod(FCPATH . "userdata/" . $srno, 0777);
+            return responseWithHeader(true, $data);
+        }
 	}
 	
 	public function usernameExists() {
