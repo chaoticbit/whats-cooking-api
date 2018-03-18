@@ -152,6 +152,5 @@ class Util extends CI_Controller {
     public function insertCuisineImages() {
         $this->load->model('Util_model');
         $result = $this->Util_model->insertCuisineImages();   
-    }
-    
+    }    
 }
