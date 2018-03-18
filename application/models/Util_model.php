@@ -4,7 +4,12 @@ class Util_model extends CI_Model {
     public function getCuisines($user_id) {
         $query = $this->db->query("select * from cuisines LEFT JOIN cuisine_user ON cuisines.srno=cuisine_user.cid AND cuisine_user.uid=" . (int)$user_id . " ORDER BY uid DESC");
         if($query->num_rows() > 0) {
-            $result = $query->result_array();            
+            $result = $query->result_array();       
+            for($i=0;$i<count($result);$i++) { 
+                $query_= $this->db->query("SELECT COUNT(*) as count FROM recipes WHERE cid=" . (int)$result[$i]['srno']);
+                $result_= $query_->row_array();
+                $result[$i]['count'] = $result_['count'];
+            }
             return $result;
         }
         return false;
