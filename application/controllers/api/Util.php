@@ -8,7 +8,22 @@ class Util extends CI_Controller {
 		}
 
 		$this->load->model('Util_model');
-        $result = $this->Util_model->getCuisines();
+        $result = $this->Util_model->getCuisines($data['user_id']);
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
+    public function updateCuisine() {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->updateCuisine($data);
         if($result) {    
             return responseWithHeader(true, $result);    		
         } else {

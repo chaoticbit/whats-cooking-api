@@ -1,13 +1,28 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Util_model extends CI_Model {
-    public function getCuisines() {
-        $result = $this->db->query("SELECT * from cuisines");
-        if($result->num_rows() > 0) {
-            return $result->result_array();
+    public function getCuisines($user_id) {
+        $query = $this->db->query("select * from cuisines LEFT JOIN cuisine_user ON cuisines.srno=cuisine_user.cid AND cuisine_user.uid=" . (int)$user_id . " ORDER BY uid DESC");
+        if($query->num_rows() > 0) {
+            $result = $query->result_array();            
+            return $result;
         }
         return false;
     }      
+
+    public function updateCuisine($data) {
+        $userid = (int)$data['user_id'];
+        $cid = (int)$data['cid'];
+
+        $query = $this->db->query("select * from cuisine_user where cid = " . $cid . " and uid = " . $userid . "");
+        if($query->num_rows() > 0) { //unfollow
+            $this->db->query("delete from cuisine_user where cid = " . $cid . " and uid = " . $userid . "");
+            return true;
+        } else {
+            $this->db->query("insert into cuisine_user values(" . $cid . "," . $userid . ")");
+            return true;
+        }        
+    }
 
     public function getTags() {
         $response = array();
