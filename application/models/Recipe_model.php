@@ -52,20 +52,28 @@ class Recipe_model extends CI_Model {
     public function getrecipes($user_id) {
         $user_id = (int)$user_id;
 
-        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, cuisines, cuisine_user, ratings where recipes.uid=useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 10");
+        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings where userprofile.uid = " . $user_id . " AND recipes.food_group <= userprofile.food_group AND recipes.spicy <= userprofile.spiciness AND recipes.uid = useraccounts.srno AND recipes.uid=useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 10");
         if($query->num_rows() > 0) { 
             $result = $query->result_array();      
             for($i=0;$i<count($result);$i++) {
                 if($result[$i]['cover_imagepath'] != '') 
                     $result[$i]['cover_imagepath'] = 'userdata/' . (int)$result[$i]['uid'] . '/' . $result[$i]['cover_imagepath'];
                 else 
-                $result[$i]['cover_imagepath'] = '';                
-                $query_ = $this->db->query("select * from favourites where rid = " . (int)$result[$i]['recipe_id'] . " and uid = " . $user_id . "");                
-                if($query_->num_rows() > 0) {
+                    $result[$i]['cover_imagepath'] = '';                
+
+                $query_favourites = $this->db->query("select * from favourites where rid = " . (int)$result[$i]['recipe_id'] . " and uid = " . $user_id . "");                
+                if($query_favourites->num_rows() > 0) {
                     $result[$i]['addedToFavourites'] = true;
                 } else {
                     $result[$i]['addedToFavourites'] = false;
-                }                
+                }        
+                
+                $query_upvotes = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['upvotes'] = $query_upvotes->num_rows();
+                $query_replies = $this->db->query("SELECT * FROM reply WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['replies'] = $query_replies->num_rows();
+                $query_views = $this->db->query("SELECT * FROM views WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['views'] = $query_views->num_rows();
             }
             return $result;      
         }
