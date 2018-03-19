@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Recipe_model extends CI_Model {
+class Recipe_model extends CI_Model {   
     public function newrecipe($data) {
         $this->db->query("INSERT into recipes(title,ingredients_html,preparation,ingredients,description,cover_imagepath,prep_time,cooking_time,servings,calorie_intake,spicy,food_group,cid,uid) VALUES ('" . $data['title'] . "','" . $data['html_ingredients_list'] . "','" . $data['preparation'] . "','" . $data['ingredients'] . "','" . $data['description'] . "','" . $data['cover_imagepath'] . "','" . $data['prep_time'] . "','" . $data['cooking_time'] . "','" . (int)$data['no_of_servings'] . "','" . (int)$data['calorie_intake'] . "','" . (int)$data['spiciness'] . "','" . (int)$data['food_group'] . "','" . (int)$data['cuisine'] . "','" . (int)$data['user_id'] . "')");        
 
@@ -111,7 +111,7 @@ class Recipe_model extends CI_Model {
         $this->db->db_debug = FALSE;
         
         $this->db->query("INSERT INTO views VALUES(" . $rid . ", " . $userid  . ")");
-                
+
         $this->db->db_debug = $orig;
     }
 }
