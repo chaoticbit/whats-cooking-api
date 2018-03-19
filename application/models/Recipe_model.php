@@ -74,9 +74,32 @@ class Recipe_model extends CI_Model {
                 $result[$i]['replies'] = $query_replies->num_rows();
                 $query_views = $this->db->query("SELECT * FROM views WHERE rid = " . $result[$i]['recipe_id']);
                 $result[$i]['views'] = $query_views->num_rows();
+
+                $query_isupvoted = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id'] . " and uid = " . $user_id . "");
+                if($query_isupvoted->num_rows() > 0) {
+                    $result[$i]['isUpvoted'] = true;
+                } else {
+                    $result[$i]['isUpvoted'] = false;
+                }        
+
             }
             return $result;      
         }
         return false;
+    }
+
+    public function upvote($data) {
+        $rid = (int)$data['rid'];
+        $userid = (int)$data['user_id'];            
+        $query = $this->db->query("select * from upvotes where rid = " . $rid . " and uid = " . $userid . "");
+        if($query->num_rows() > 0) { //remove upvote
+            $this->db->query("delete from upvotes where rid = " . $rid . " and uid = " . $userid . "");
+            $updated = $this->db->query("SELECT COUNT(*) as upvote_cnt FROM upvotes WHERE rid=" . $rid . "");            
+            return $updated->row_array();
+        } else { //add upvote
+            $this->db->query("insert into upvotes(rid, uid) values(" . $rid . "," . $userid . ")");                        
+            $updated = $this->db->query("SELECT COUNT(*) as upvote_cnt FROM upvotes WHERE rid=" . $rid . "");            
+            return $updated->row_array();            
+        }  
     }
 }
