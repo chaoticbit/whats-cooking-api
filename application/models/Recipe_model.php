@@ -52,7 +52,7 @@ class Recipe_model extends CI_Model {
     public function getrecipes($user_id) {
         $user_id = (int)$user_id;
 
-        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings where userprofile.uid = " . $user_id . " AND recipes.food_group <= userprofile.food_group AND recipes.spicy <= userprofile.spiciness AND recipes.uid = useraccounts.srno AND recipes.uid=useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 10");
+        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings where userprofile.uid = " . $user_id . " AND userprofile.food_group >= recipes.food_group AND userprofile.spiciness >= recipes.spicy AND recipes.uid = useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 10");
         if($query->num_rows() > 0) { 
             $result = $query->result_array();      
             for($i=0;$i<count($result);$i++) {
@@ -101,5 +101,17 @@ class Recipe_model extends CI_Model {
             $updated = $this->db->query("SELECT COUNT(*) as upvote_cnt FROM upvotes WHERE rid=" . $rid . "");            
             return $updated->row_array();            
         }  
+    }
+
+    public function register_view($data){
+        $rid = (int)$data['rid'];
+        $userid = (int)$data['user_id'];     
+
+        $orig = $this->db->db_debug;
+        $this->db->db_debug = FALSE;
+        
+        $this->db->query("INSERT INTO views VALUES(" . $rid . ", " . $userid  . ")");
+        
+        $this->db->db_debug = $orig;
     }
 }
