@@ -15,4 +15,19 @@ class Search extends CI_Controller {
             return responseWithHeader(true, []);    		        
         }
     }
+
+    public function ingredients() {
+        $data = verifyRequest();
+        if(!$data) {
+			return authenticationFailedRequest();
+        }
+
+        $keyword = $data['keyword'];
+        $userid = (int)$data['user_id'];
+        $ingredients = $data['ingredients'];
+
+        $this->load->model('Search_model');
+        $result = $this->Search_model->ingredientSearch($keyword, $userid, $ingredients);
+        var_dump($result);
+    }
 }
