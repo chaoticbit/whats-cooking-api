@@ -43,10 +43,18 @@ class Search_model extends CI_Model {
         //     $findset3 = FIND_IN_SET('" . $ing[2] . "');
         $orig = $this->db->db_debug;
         $this->db->db_debug = FALSE;
+        
+        $response = array();
 
-        $query = $this->db->query("select recipes.srno, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients)");
+        $query = $this->db->query("select recipes.srno, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) AND FIND_IN_SET('" . $ing[1] . "', ingredients) AND FIND_IN_SET('" . $ing[2] . "', ingredients)");
         $result = $query->result_array();
-        echo print_r($result);
+        array_push($response, $result);
+
+        $query2 = $this->db->query("select recipes.srno, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients)");
+        $result2 = $query2->result_array();
+        array_push($response, $result2);
         $this->db->db_debug = $orig;
+
+        die(json_encode($response));
     }
 }

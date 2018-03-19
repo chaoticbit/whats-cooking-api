@@ -111,7 +111,7 @@ class Recipe_model extends CI_Model {
         $this->db->db_debug = FALSE;
         
         $this->db->query("INSERT INTO views VALUES(" . $rid . ", " . $userid  . ")");
-        
+                
         $this->db->db_debug = $orig;
     }
 }
