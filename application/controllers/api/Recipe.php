@@ -1,17 +1,8 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Recipe extends CI_Controller {    
-    public function _remap($param) {        
-        if($param == 'index') {
-            return $this->output
-            ->set_status_header(401)            
-            ->set_output('No direct script access allowed');
-        } else {
-            $this->index($param);
-        }
-    }
+class Recipe extends CI_Controller {        
 
-    public function index($rid) {
+    public function get($rid) {
         $data = verifyRequest();
         if(!$data) {
 			return authenticationFailedRequest();
