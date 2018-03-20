@@ -34,27 +34,36 @@ class Search_model extends CI_Model {
         // die(print_r($resp));
         // return $resp;
 
-        $ing = explode(',', $ingredients);
-        // if($ing[0]) 
-        //     $findset1 = FIND_IN_SET('" . $ing[0] . "');
-        // if($ing[1])
-        //     $findset2 = FIND_IN_SET('" . $ing[1] . "');
-        // if($ing[2])
-        //     $findset3 = FIND_IN_SET('" . $ing[2] . "');
+        $ing = explode(',', $ingredients);        
         $orig = $this->db->db_debug;
         $this->db->db_debug = FALSE;
         
         $response = array();
 
         $query = $this->db->query("select recipes.srno, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) AND FIND_IN_SET('" . $ing[1] . "', ingredients) AND FIND_IN_SET('" . $ing[2] . "', ingredients)");
-        $result = $query->result_array();
-        array_push($response, $result);
+        $exact_match_results = $query->result_array();        
+        array_push($response, $exact_match_results);
 
         $query2 = $this->db->query("select recipes.srno, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients)");
-        $result2 = $query2->result_array();
+        $result2 = $query2->result_array();        
         array_push($response, $result2);
-        $this->db->db_debug = $orig;
 
+        $this->db->db_debug = $orig;
+        
+        // $no_duplicate = [];
+        
+        // if($query->num_rows() > 0) {
+        //     for ($i=0; $i < count($exact_match_results); $i++) { 
+        //         for ($j=0; $j < count($result2); $j++) { 
+        //             if($exact_match_results[$i]['srno'] != $result2[$j]['srno']) {
+        //                 array_push($no_duplicate, $result2[$j]);
+        //             }         
+        //         }    
+        //     }            
+        // } else {
+        //     // array_push($response, $result2);
+        // }        
+                
         die(json_encode($response));
     }
 }

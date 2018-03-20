@@ -88,6 +88,31 @@ class Recipe_model extends CI_Model {
         return false;
     }
 
+    public function fetchSingleRecipe($rid, $userid) {
+        $query = $this->db->query("select recipes.*, cuisines.name as cname, useraccounts.username, concat(useraccounts.fname,' ',useraccounts.lname) as owner, ratings.srno as rating_id, ratings.rating, (select count(*) from upvotes where upvotes.rid = recipes.srno) as upvotes, (select count(*) from reply where reply.rid = recipes.srno) as replies, (select count(*) from views where views.rid = recipes.srno) as views, (select count(*) from upvotes where upvotes.rid = " . $rid . " and upvotes.uid = " . $userid . ") as is_upvoted, (select count(*) from favourites where favourites.rid = " . $rid . " and favourites.uid = " . $userid . ") as is_favourite from recipes, useraccounts, ratings, cuisines where recipes.srno=" . $rid . " and recipes.srno = ratings.rid and recipes.cid = cuisines.srno and recipes.uid = useraccounts.srno");
+        if($query->num_rows() > 0) {
+            $result = $query->row_array();
+            $result['time_elapsed'] = time_elapsed($result['timestamp']);
+            $query_tags = $this->db->query("SELECT recipe_tags.name FROM recipe_tags WHERE rid=" . (int)$result['srno']);
+            if($query_tags->num_rows()>0){
+                $result['tags'] = $query_tags->result_array();
+            }
+            else{
+                $result['tags'] = false;
+            }
+
+            $query_gallery = $this->db->query("select gallery.path, gallery.type from gallery where rid = " . (int)$result['srno']);
+            if($query_gallery->num_rows()>0){
+                $result['gallery'] = $query_gallery->result_array();
+            }
+            else{
+                $result['gallery'] = false;
+            }
+            return $result;
+        }
+        return false;
+    }
+
     public function upvote($data) {
         $rid = (int)$data['rid'];
         $userid = (int)$data['user_id'];            
@@ -115,3 +140,4 @@ class Recipe_model extends CI_Model {
         $this->db->db_debug = $orig;
     }
 }
+
