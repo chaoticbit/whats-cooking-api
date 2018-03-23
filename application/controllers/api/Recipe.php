@@ -60,4 +60,15 @@ class Recipe extends CI_Controller {
         $result = $this->Recipe_model->rate($data);    
         return responseWithHeader(true, $result);    		                
     }
+
+    public function post_reply() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->post_reply($data);    
+        return responseWithHeader(true, $result);    		                
+    }
 }

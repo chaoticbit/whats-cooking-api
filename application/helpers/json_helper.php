@@ -66,7 +66,7 @@ function verifyRequest() {
 }
 
 function time_elapsed($datetime, $full = false) {
-    date_default_timezone_set("Asia/Kolkata");
+    date_default_timezone_set("America/New_York");
     $now = new DateTime();
     $ago = new DateTime($datetime);
     $diff = $now->diff($ago);

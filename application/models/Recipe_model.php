@@ -116,6 +116,17 @@ class Recipe_model extends CI_Model {
             else{
                 $result['gallery'] = false;
             }
+
+            $query_replies = $this->db->query("select reply.*, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, useraccounts.username from reply, useraccounts where rid = " . $rid . " and reply.uid = useraccounts.srno order by timestamp DESC");
+            if($query_replies->num_rows() > 0){
+                $result_replies = $query_replies->result_array();
+                $result['list_of_replies'] = $result_replies;
+                for($i=0;$i<count($result['list_of_replies']);$i++) { 
+                    $result['list_of_replies'][$i]['time_elapsed'] = time_elapsed($result['list_of_replies'][$i]['timestamp']);
+                }                                
+            } else {
+                $result['list_of_replies'] = [];
+            }
             return $result;
         }
         return false;
@@ -160,6 +171,27 @@ class Recipe_model extends CI_Model {
             $result = $query->row_array();
             return $result;
         }
+    }
+
+    public function post_reply($data) {
+        $orig = $this->db->db_debug;
+        $this->db->db_debug = FALSE;
+
+        $rid = $this->security->xss_clean((int)$data['rid']);
+        $userid = $this->security->xss_clean((int)$data['user_id']);
+        $description = $this->security->xss_clean($data['description']);
+
+        $this->db->query("INSERT into reply(description,rid,uid) VALUES ('" . $description . "'," . $rid . "," . $userid . ")");
+
+        $this->db->db_debug = $orig;
+
+        $query = $this->db->query("select reply.*, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, useraccounts.username from reply, useraccounts where reply.rid = " . (int)$data['rid'] . " and reply.uid = " . (int)$data['user_id'] . " and reply.uid=useraccounts.srno order by timestamp DESC LIMIT 1");
+        if($query->num_rows() > 0) {
+            $result = $query->row_array();   
+            $result['time_elapsed'] = time_elapsed($result['timestamp']);
+            return $result;
+        }
+        return false;       
     }
 }
 
