@@ -89,7 +89,7 @@ class Recipe_model extends CI_Model {
     }
 
     public function fetchSingleRecipe($rid, $userid) {
-        $query = $this->db->query("select recipes.*, cuisines.name as cname, useraccounts.username, concat(useraccounts.fname,' ',useraccounts.lname) as owner, ratings.srno as rating_id, ratings.rating, (select count(*) from upvotes where upvotes.rid = recipes.srno) as upvotes, (select count(*) from reply where reply.rid = recipes.srno) as replies, (select count(*) from views where views.rid = recipes.srno) as views, (select count(*) from upvotes where upvotes.rid = " . $rid . " and upvotes.uid = " . $userid . ") as is_upvoted, (select count(*) from favourites where favourites.rid = " . $rid . " and favourites.uid = " . $userid . ") as is_favourite from recipes, useraccounts, ratings, cuisines where recipes.srno=" . $rid . " and recipes.srno = ratings.rid and recipes.cid = cuisines.srno and recipes.uid = useraccounts.srno");
+        $query = $this->db->query("select recipes.*, cuisines.name as cname, useraccounts.username, concat(useraccounts.fname,' ',useraccounts.lname) as owner, ratings.srno as rating_id, ratings.rating, (select count(*) from upvotes where upvotes.rid = recipes.srno) as upvotes, (select count(*) from reply where reply.rid = recipes.srno) as replies, (select count(*) from views where views.rid = recipes.srno) as views, (select count(*) from upvotes where upvotes.rid = " . $rid . " and upvotes.uid = " . $userid . ") as is_upvoted, (select count(*) from favourites where favourites.rid = " . $rid . " and favourites.uid = " . $userid . ") as is_favourite, (select count(*) from ratings, ratings_per_user where ratings.rid = " . $rid . " and ratings.srno = ratings_per_user.rating_id and ratings_per_user.uid = " . $userid . ") as is_rated from recipes, useraccounts, ratings, cuisines where recipes.srno=" . $rid . " and recipes.srno = ratings.rid and recipes.cid = cuisines.srno and recipes.uid = useraccounts.srno");
         if($query->num_rows() > 0) {
             $result = $query->row_array();
             $result['time_elapsed'] = time_elapsed($result['timestamp']);
@@ -99,6 +99,14 @@ class Recipe_model extends CI_Model {
             }
             else{
                 $result['tags'] = false;
+            }
+
+            $query_rating = $this->db->query("select ratings.rating from ratings, ratings_per_user where ratings.rid = " . $rid . " and ratings.srno = ratings_per_user.rating_id and ratings_per_user.uid = " . $userid . ""); 
+            if($query_rating->num_rows() > 0) {
+                $result_rating = $query_rating->row_array();
+                $result['user_rating'] = $result_rating['rating'];
+            } else {
+                $result['user_rating'] = 0;
             }
 
             $query_gallery = $this->db->query("select gallery.path, gallery.type from gallery where rid = " . (int)$result['srno']);
@@ -138,6 +146,20 @@ class Recipe_model extends CI_Model {
         $this->db->query("INSERT INTO views VALUES(" . $rid . ", " . $userid  . ")");
 
         $this->db->db_debug = $orig;
+    }
+
+    public function rate($data) {
+        $userid = (int)$data['user_id'];
+        $rid = (int)$data['rid'];
+        $rating_id = (int)$data['rating_id'];
+        $rating = (int)$data['rating'];
+
+        $this->db->query("insert into ratings_per_user values (" . $rating_id . "," . $rating . "," . $userid . ") ");
+        $query = $this->db->query("select * from ratings where rid = " . $rid . "");
+        if($query->num_rows() > 0) {
+            $result = $query->row_array();
+            return $result;
+        }
     }
 }
 

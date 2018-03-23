@@ -49,4 +49,15 @@ class Recipe extends CI_Controller {
         $result = $this->Recipe_model->upvote($data);    
         return responseWithHeader(true, $result);    		                
     }
+    
+    public function rate() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->rate($data);    
+        return responseWithHeader(true, $result);    		                
+    }
 }
