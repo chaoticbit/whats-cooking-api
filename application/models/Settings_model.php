@@ -2,9 +2,10 @@
 
 class Settings_model extends CI_Model {
     public function getUserProfile($data) {
-        $result = $this->db->query("SELECT * from userprofile where uid = " . (int)$data['user_id']);
-        if($result->num_rows() > 0) {
-            return $result->row_array();
+        $query = $this->db->query("select useraccounts.srno, useraccounts.password, useraccounts.username, useraccounts.fname, useraccounts.lname, useraccounts.email, userprofile.*, cuisines.name as cname, cuisines.srno as cid from useraccounts, userprofile, cuisines where userprofile.pref_cuisine = cuisines.srno and useraccounts.srno = " . (int)$data['user_id'] . " and userprofile.uid = useraccounts.srno");              
+            $result = $query->row_array();
+        if($query->num_rows() > 0) {
+            return $query->row_array();
         }
         return false;
     }
