@@ -43,5 +43,20 @@ class Settings extends CI_Controller {
 
 	public function updateUserProfile() {
 
-	}
+    }
+    
+    public function update() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+        }		
+        
+		$this->load->model('Settings_model');
+		$result = $this->Settings_model->update($data);
+		if($result) {
+			return responseWithHeader(true, $result);    
+		} else {
+			return responseWithHeader(false, false);    			
+		}
+    }
 }
