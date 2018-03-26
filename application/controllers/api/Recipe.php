@@ -71,4 +71,34 @@ class Recipe extends CI_Controller {
         $result = $this->Recipe_model->post_reply($data);    
         return responseWithHeader(true, $result);    		                
     }
+
+    public function per_category_recipes() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->per_category_recipes($data);    
+        if($result) {
+            return responseWithHeader(true, $result);    		                
+        } else {
+            return responseWithHeader(true, []);    		                
+        }
+    }
+
+    public function category_related_tags() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->category_related_tags($data);    
+        if($result) {
+            return responseWithHeader(true, $result);    		                
+        } else {
+            return responseWithHeader(true, []);    		                
+        }
+    }
 }
