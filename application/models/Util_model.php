@@ -42,6 +42,19 @@ class Util_model extends CI_Model {
         return $response;
     }
 
+    public function getTagsByKey($key) {
+        $response = array();
+        $query = $this->db->query("SELECT tags.name FROM tags WHERE tags.name LIKE '%$key%'");
+        if($query->num_rows() > 0) {
+            $result = $query->result_array();
+            foreach($result as $item) {
+                $tag_result = array("name"=>$item['name'],"value"=>$item['name'],"text"=>$item['name']);
+                array_push($response, $tag_result);
+            }
+        }
+        return $response;
+    }
+
     public function addToFavourites($data) {
         $this->db->query("insert into favourites values(" . (int)$data['rid'] . ", " . (int)$data['user_id'] . ")");
         $query = $this->db->query("select * from favourites where rid = " . (int)$data['rid'] . " and uid = " . (int)$data['user_id'] . "");

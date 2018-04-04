@@ -46,6 +46,21 @@ class Util extends CI_Controller {
         }
     }
 
+    public function getTagsByKey($key) {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->getTagsByKey($key);
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
     public function addToFavourites() {
         $data = verifyRequest();        
 		if(!$data) {
