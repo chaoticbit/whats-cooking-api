@@ -16,6 +16,21 @@ class Util extends CI_Controller {
         }
     }
 
+    public function autocompleteIngredients($key) {
+        $data = verifyRequest();        
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Util_model');
+        $result = $this->Util_model->autocompleteIngredients($key);
+        if($result) {    
+            return responseWithHeader(true, $result);    		
+        } else {
+            return responseWithHeader(true, []);    		
+        }
+    }
+
     public function updateCuisine() {
         $data = verifyRequest();        
 		if(!$data) {

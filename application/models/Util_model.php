@@ -55,6 +55,14 @@ class Util_model extends CI_Model {
         return $response;
     }
 
+    public function autocompleteIngredients($key) {
+        $query = $this->db->query("SELECT name FROM ingredients WHERE name LIKE '%$key%'");
+        if($query->num_rows() > 0) {
+            $result = $query->result_array();
+        }
+        return $result;
+    }
+
     public function addToFavourites($data) {
         $this->db->query("insert into favourites values(" . (int)$data['rid'] . ", " . (int)$data['user_id'] . ")");
         $query = $this->db->query("select * from favourites where rid = " . (int)$data['rid'] . " and uid = " . (int)$data['user_id'] . "");
