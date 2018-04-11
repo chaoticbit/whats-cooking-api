@@ -24,7 +24,7 @@ class Search_model extends CI_Model {
         return $arr;
     }
 
-    public function ingredientSearch($keyword, $userid, $ingredients) {
+    public function ingredientSearch($keyword, $userid, $ingredients, $exclude) {        
         /* $query = $this->db->query("SELECT distinct recipes.srno, recipes.title, recipes.ingredients from recipes, userprofile where title LIKE '%" . $keyword . "%'");
         $result = $query->result_array();
 
@@ -51,22 +51,64 @@ class Search_model extends CI_Model {
         $resp = $this->bubble_sort($resp);
         header('Content-Type: application/json');
         die(json_encode($resp));         */
+        
+        $ing = explode(',', $ingredients);                        
+        $query2 = '';
+        $result2 = '';
+        $count = count($ing);
 
-        $ing = explode(',', $ingredients);                
-        $response = array();
+        if($count == 1) {
+            if($keyword == '') {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where match(ingredients) against('" . $ing[0] . "' in natural language mode)");
+                } else {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode)");                    
+                }
+            } else {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND match(ingredients) against('" . $ing[0] . "' in natural language mode)");
+                } else {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode)");                    
+                }
+            }                        
+        } else if($count == 2) {
+            if($keyword == '') {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode))");
+                } else {                    
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                }
+            } else {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                } else {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                }
+            }                        
+        } else if($count == 3) {
+            if($keyword == '') {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                } else {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                }
+            } else {
+                if($exclude == '') {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                } else {
+                    $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '%" . $keyword . "%' AND FIND_IN_SET('" . $exclude . "', ingredients) = 0 AND match(ingredients) against('" . $ing[0] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode) OR match(ingredients) against('" . $ing[1] . "' in natural language mode)");
+                }
+            }                        
+        }
 
-        // $query = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) AND FIND_IN_SET('" . $ing[1] . "', ingredients) AND FIND_IN_SET('" . $ing[2] . "', ingredients)");
-        // $exact_match_results = $query->result_array();        
-        // array_push($response, $exact_match_results);
-
-        // $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients)");
-        // $result2 = $query2->result_array();        
-        // array_push($response, $result2);        
-                
-        $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where MATCH (ingredients) AGAINST ('" . $ing[0] . "' IN NATURAL LANGUAGE MODE)");
-        $result2 = $query2->result_array();        
-        // array_push($response, $result2);        
-
+        /* if($exclude == '') {
+            $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '" . $keyword . "' AND FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients)");
+            $result2 = $query2->result_array();         
+        } else {
+            $query2 = $this->db->query("select recipes.srno, recipes.title, recipes.ingredients from recipes where recipes.title LIKE '" . $keyword . "' AND FIND_IN_SET('" . $ing[0] . "', ingredients) OR FIND_IN_SET('" . $ing[1] . "', ingredients) OR FIND_IN_SET('" . $ing[2] . "', ingredients) AND NOT FIND_IN_SET('" . $exclude . "', ingredients)");
+            $result2 = $query2->result_array();         
+        } */
+        $result2 = $query2->result_array();
         header('Content-Type: application/json');
         die(json_encode($result2));
     }

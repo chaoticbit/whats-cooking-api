@@ -25,9 +25,10 @@ class Search extends CI_Controller {
         $keyword = $data['keyword'];
         $userid = (int)$data['user_id'];
         $ingredients = $data['ingredients'];
-
+        $exclude = $data['exclude'];
+        
         $this->load->model('Search_model');
-        $result = $this->Search_model->ingredientSearch($keyword, $userid, $ingredients);
+        $result = $this->Search_model->ingredientSearch($keyword, $userid, $ingredients, $exclude);
         var_dump($result);
     }
 }
