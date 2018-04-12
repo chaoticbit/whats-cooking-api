@@ -87,6 +87,21 @@ class Recipe extends CI_Controller {
         }
     }
 
+    public function per_tag_recipes() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->per_tag_recipes($data);    
+        if($result) {
+            return responseWithHeader(true, $result);    		                
+        } else {
+            return responseWithHeader(true, []);    		                
+        }
+    }
+
     public function category_related_tags() {
         $data = verifyRequest();
 		if(!$data) {

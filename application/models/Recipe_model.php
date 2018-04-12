@@ -242,6 +242,50 @@ class Recipe_model extends CI_Model {
         return false;
     }
 
+    public function per_tag_recipes($data) {
+        $user_id = (int)$data['user_id'];
+        $tag = $data['tag'];
+        
+        $query = $this->db->query("SELECT * FROM tags WHERE name = '" . $tag . "'");
+        if($query->num_rows() > 0) {
+            $query1 = $this->db->query("select distinct recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, useraccounts.username, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings, recipe_tags where recipe_tags.rid = recipes.srno AND recipe_tags.name = '" . $tag . "' AND recipes.uid = useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid order by recipes.timestamp DESC LIMIT 10");
+            if($query1->num_rows() > 0) {
+                $result = $query1->result_array();
+                for($i=0;$i<count($result);$i++) {
+                    if($result[$i]['cover_imagepath'] != '') 
+                        $result[$i]['cover_imagepath'] = 'userdata/' . (int)$result[$i]['uid'] . '/' . $result[$i]['cover_imagepath'];
+                    else 
+                        $result[$i]['cover_imagepath'] = '';                
+    
+                    $query_favourites = $this->db->query("select * from favourites where rid = " . (int)$result[$i]['recipe_id'] . " and uid = " . $user_id . "");                
+                    if($query_favourites->num_rows() > 0) {
+                        $result[$i]['addedToFavourites'] = true;
+                    } else {
+                        $result[$i]['addedToFavourites'] = false;
+                    }        
+                    
+                    $query_upvotes = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id']);
+                    $result[$i]['upvotes'] = $query_upvotes->num_rows();
+                    $query_replies = $this->db->query("SELECT * FROM reply WHERE rid = " . $result[$i]['recipe_id']);
+                    $result[$i]['replies'] = $query_replies->num_rows();
+                    $query_views = $this->db->query("SELECT * FROM views WHERE rid = " . $result[$i]['recipe_id']);
+                    $result[$i]['views'] = $query_views->num_rows();
+    
+                    $query_isupvoted = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id'] . " and uid = " . $user_id . "");
+                    if($query_isupvoted->num_rows() > 0) {
+                        $result[$i]['isUpvoted'] = true;
+                    } else {
+                        $result[$i]['isUpvoted'] = false;
+                    }        
+    
+                }
+                return $result;
+            }
+            return false;
+        }
+        return false;
+    }
+
     public function category_related_tags($data) {
         $cid = (int)$data['cid'];
         $user_id = (int)$data['user_id'];
