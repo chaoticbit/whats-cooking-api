@@ -121,4 +121,70 @@ class Search_model extends CI_Model {
         header('Content-Type: application/json');
         die(json_encode($result2));
     }
+
+    public function g_search($data, $filters) {
+        $userid = (int)$data['user_id'];
+
+        $query = "SELECT recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, cuisines, ratings WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
+        $conditions = array();
+
+        if(!empty($filters['spicy'])) {
+            $conditions[] = "spicy=" . (int)$filters['spicy'];
+        }
+        if(!empty($filters['food_group'])) {
+            $conditions[] = "food_group=" . (int)$filters['food_group'];
+        }
+        if(!empty($filters['servings'])) {
+            $conditions[] = "servings=" . (int)$filters['servings'];            
+        }
+        if(!empty($filters['cid'])) {
+            $conditions[] = "cid=" . (int)$filters['cid'];            
+        }
+        if(!empty($filters['calorie_intake'])) {
+            $conditions[] = "calorie_intake=" . (int)$filters['calorie_intake'];            
+        }
+        if(!empty($filters['prep_time'])) {
+            $conditions[] = "substring_index(prep_time, ' ', 1)=" . (int)$filters['prep_time'];            
+        }
+
+        $sql = $query;
+        if(count($conditions) > 0) {
+            $sql .= " " . implode(' AND ', $conditions);
+        }
+        $sql .= " AND recipes.cid = cuisines.srno AND recipes.uid = useraccounts.srno AND recipes.srno = ratings.rid";
+
+        $exe_query = $this->db->query($sql);                
+        if($exe_query->num_rows() > 0) { 
+            $result = $exe_query->result_array();   
+            for($i=0;$i<count($result);$i++) {
+                if($result[$i]['cover_imagepath'] != '') 
+                    $result[$i]['cover_imagepath'] = 'userdata/' . (int)$result[$i]['uid'] . '/' . $result[$i]['cover_imagepath'];
+                else 
+                    $result[$i]['cover_imagepath'] = '';                
+
+                $query_favourites = $this->db->query("select * from favourites where rid = " . (int)$result[$i]['recipe_id'] . " and uid = " . $userid . "");                
+                if($query_favourites->num_rows() > 0) {
+                    $result[$i]['addedToFavourites'] = true;
+                } else {
+                    $result[$i]['addedToFavourites'] = false;
+                }        
+                
+                $query_upvotes = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['upvotes'] = $query_upvotes->num_rows();
+                $query_replies = $this->db->query("SELECT * FROM reply WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['replies'] = $query_replies->num_rows();
+                $query_views = $this->db->query("SELECT * FROM views WHERE rid = " . $result[$i]['recipe_id']);
+                $result[$i]['views'] = $query_views->num_rows();
+
+                $query_isupvoted = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result[$i]['recipe_id'] . " and uid = " . $userid . "");
+                if($query_isupvoted->num_rows() > 0) {
+                    $result[$i]['isUpvoted'] = true;
+                } else {
+                    $result[$i]['isUpvoted'] = false;
+                }        
+            }
+            return $result;            
+        } 
+        return false;
+    }
 }

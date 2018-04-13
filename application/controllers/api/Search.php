@@ -31,4 +31,28 @@ class Search extends CI_Controller {
         $result = $this->Search_model->ingredientSearch($keyword, $userid, $ingredients, $exclude);
         var_dump($result);
     }
+
+    public function g($key) {
+        $data = verifyRequest();
+        if(!$data) {
+			return authenticationFailedRequest();
+        }
+
+        $filters = array();
+        $filters['key'] = $this->security->xss_clean($key);        
+        $filters['spicy'] = $this->security->xss_clean($this->input->get('s'));        
+        $filters['food_group'] = $this->security->xss_clean($this->input->get('g'));
+        $filters['calorie_intake'] = $this->security->xss_clean($this->input->get('c'));
+        $filters['cid'] = $this->security->xss_clean($this->input->get('cid'));
+        $filters['prep_time'] = $this->security->xss_clean($this->input->get('p'));
+        $filters['servings'] = $this->security->xss_clean($this->input->get('n'));
+        
+        $this->load->model('Search_model');
+        $result = $this->Search_model->g_search($data, $filters);
+        if($result) {
+            return responseWithHeader(true, $result);    		        
+        } else {
+            return responseWithHeader(true, []);    		        
+        }
+    }
 }
