@@ -28,8 +28,12 @@ class Search extends CI_Controller {
         $exclude = $data['exclude'];
         
         $this->load->model('Search_model');
-        $result = $this->Search_model->ingredientSearch($keyword, $userid, $ingredients, $exclude);
-        var_dump($result);
+        $result = $this->Search_model->i_search($keyword, $userid, $ingredients, $exclude);
+        if($result) {
+            return responseWithHeader(true, $result);    		        
+        } else {
+            return responseWithHeader(true, []);    		        
+        }
     }
 
     public function g($key) {
