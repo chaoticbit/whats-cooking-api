@@ -45,11 +45,11 @@ class Search extends CI_Controller {
         $filters = array();
         $filters['key'] = $this->security->xss_clean($key);        
         $filters['spicy'] = $this->security->xss_clean($this->input->get('s'));        
-        $filters['food_group'] = $this->security->xss_clean($this->input->get('g'));
-        $filters['calorie_intake'] = $this->security->xss_clean($this->input->get('c'));
+        $filters['food_group'] = $this->security->xss_clean($this->input->get('fg'));
+        $filters['calorie_intake'] = $this->security->xss_clean($this->input->get('cal'));
         $filters['cid'] = $this->security->xss_clean($this->input->get('cid'));
-        $filters['prep_time'] = $this->security->xss_clean($this->input->get('p'));
-        $filters['servings'] = $this->security->xss_clean($this->input->get('n'));
+        $filters['cooking_time'] = $this->security->xss_clean($this->input->get('ct'));
+        // $filters['servings'] = $this->security->xss_clean($this->input->get('n'));
         
         $this->load->model('Search_model');
         $result = $this->Search_model->g_search($data, $filters);

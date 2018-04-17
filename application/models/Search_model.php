@@ -212,18 +212,17 @@ class Search_model extends CI_Model {
         }
         if(!empty($filters['food_group'])) {
             $conditions[] = "food_group=" . (int)$filters['food_group'];
-        }
-        if(!empty($filters['servings'])) {
-            $conditions[] = "servings=" . (int)$filters['servings'];            
-        }
+        }        
         if(!empty($filters['cid'])) {
             $conditions[] = "cid=" . (int)$filters['cid'];            
         }
         if(!empty($filters['calorie_intake'])) {
             $conditions[] = "calorie_intake=" . (int)$filters['calorie_intake'];            
         }
-        if(!empty($filters['prep_time'])) {
-            $conditions[] = "substring_index(prep_time, ' ', 1)=" . (int)$filters['prep_time'];            
+        if(!empty($filters['cooking_time'])) {
+            // $conditions[] = "substring_index(cooking_time, ' ', 1)=" . (int)$filters['cooking_time'];            
+
+            $conditions[] = "cooking_time='" . $filters['cooking_time'] . "'";
         }
 
         $sql = $query;
@@ -231,7 +230,7 @@ class Search_model extends CI_Model {
             $sql .= " " . implode(' AND ', $conditions);
         }
         $sql .= " AND recipes.cid = cuisines.srno AND recipes.uid = useraccounts.srno AND recipes.srno = ratings.rid";
-
+        
         $exe_query = $this->db->query($sql);                
         if($exe_query->num_rows() > 0) { 
             $result = $exe_query->result_array();   
