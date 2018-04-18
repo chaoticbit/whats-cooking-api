@@ -208,21 +208,21 @@ class Search_model extends CI_Model {
         $conditions = array();
 
         if(!empty($filters['spicy'])) {
-            $conditions[] = "spicy=" . (int)$filters['spicy'];
+            $conditions[] = "spicy <= " . (int)$filters['spicy'];
         }
         if(!empty($filters['food_group'])) {
-            $conditions[] = "food_group=" . (int)$filters['food_group'];
+            $conditions[] = "food_group = " . (int)$filters['food_group'];
         }        
         if(!empty($filters['cid'])) {
             $conditions[] = "cid=" . (int)$filters['cid'];            
         }
         if(!empty($filters['calorie_intake'])) {
-            $conditions[] = "calorie_intake=" . (int)$filters['calorie_intake'];            
+            $conditions[] = "calorie_intake <= " . (int)$filters['calorie_intake'];            
         }
         if(!empty($filters['cooking_time'])) {
             // $conditions[] = "substring_index(cooking_time, ' ', 1)=" . (int)$filters['cooking_time'];            
 
-            $conditions[] = "cooking_time='" . $filters['cooking_time'] . "'";
+            $conditions[] = "cast(cooking_time as signed) <= cast('" . $filters['cooking_time'] . "' as signed)";
         }
 
         $sql = $query;
