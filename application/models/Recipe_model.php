@@ -52,8 +52,8 @@ class Recipe_model extends CI_Model {
     public function getrecipes($user_id) {
         $user_id = (int)$user_id;
         
-        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, useraccounts.username, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings where userprofile.uid = " . $user_id . " AND userprofile.food_group >= recipes.food_group AND userprofile.spiciness >= recipes.spicy AND recipes.uid = useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 10");
-        if($query->num_rows() > 0) { 
+        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.calorie_intake, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, userprofile.profile_imagepath, useraccounts.username, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, cuisine_user, ratings where (recipes.food_group <= userprofile.food_group) AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.srno=ratings.rid AND recipes.cid=cuisines.srno AND recipes.cid=cuisine_user.cid AND cuisine_user.uid=" . $user_id . " order by timestamp DESC LIMIT 20");
+        if($query->num_rows() > 0) {             
             $result = $query->result_array();      
             for($i=0;$i<count($result);$i++) {
                 if($result[$i]['cover_imagepath'] != '') 
