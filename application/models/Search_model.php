@@ -204,32 +204,33 @@ class Search_model extends CI_Model {
     public function g_search($data, $filters) {
         $userid = (int)$data['user_id'];
 
-        $query = "SELECT recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, cuisines, ratings WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
+        $query = "SELECT recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.calorie_intake, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, userprofile.profile_imagepath, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, ratings WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
         $conditions = array();
 
         if(!empty($filters['spicy'])) {
-            $conditions[] = "spicy <= " . (int)$filters['spicy'];
+            $conditions[] = "recipes.spicy <= " . (int)$filters['spicy'];
         }
         if(!empty($filters['food_group'])) {
-            $conditions[] = "food_group = " . (int)$filters['food_group'];
+            $conditions[] = "recipes.food_group = " . (int)$filters['food_group'];
         }        
         if(!empty($filters['cid'])) {
-            $conditions[] = "cid=" . (int)$filters['cid'];            
+            $conditions[] = "recipes.cid=" . (int)$filters['cid'];            
         }
         if(!empty($filters['calorie_intake'])) {
-            $conditions[] = "calorie_intake <= " . (int)$filters['calorie_intake'];            
+            $conditions[] = "recipes.calorie_intake <= " . (int)$filters['calorie_intake'];            
         }
         if(!empty($filters['cooking_time'])) {
-            // $conditions[] = "substring_index(cooking_time, ' ', 1)=" . (int)$filters['cooking_time'];            
-
-            $conditions[] = "cast(cooking_time as signed) <= cast('" . $filters['cooking_time'] . "' as signed)";
+            // $conditions[] = "substring_index(cooking_time, ' ', 1)=" . (int)$filters['cooking_time'];           
+            $conditions[] = "cast(recipes.cooking_time as signed) <= cast('" . $filters['cooking_time'] . "' as signed)";
         }
 
         $sql = $query;
         if(count($conditions) > 0) {
             $sql .= " " . implode(' AND ', $conditions);
+            $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
+        } else {
+            $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
         }
-        $sql .= " AND recipes.cid = cuisines.srno AND recipes.uid = useraccounts.srno AND recipes.srno = ratings.rid";
         
         $exe_query = $this->db->query($sql);                
         if($exe_query->num_rows() > 0) { 
