@@ -49,7 +49,7 @@ class Search extends CI_Controller {
         $filters['calorie_intake'] = $this->security->xss_clean($this->input->get('cal'));
         $filters['cid'] = $this->security->xss_clean($this->input->get('cid'));
         $filters['cooking_time'] = $this->security->xss_clean($this->input->get('ct'));
-        // $filters['servings'] = $this->security->xss_clean($this->input->get('n'));
+        $filters['sort_by'] = $this->security->xss_clean($this->input->get('sort_by'));
         
         $this->load->model('Search_model');
         $result = $this->Search_model->g_search($data, $filters);

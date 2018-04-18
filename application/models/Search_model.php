@@ -204,7 +204,7 @@ class Search_model extends CI_Model {
     public function g_search($data, $filters) {
         $userid = (int)$data['user_id'];
 
-        $query = "SELECT recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.calorie_intake, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, userprofile.profile_imagepath, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, ratings WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
+        $query = "SELECT distinct recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.calorie_intake, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, userprofile.profile_imagepath, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, ratings, weightage WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
         $conditions = array();
 
         if(!empty($filters['spicy'])) {
@@ -227,9 +227,25 @@ class Search_model extends CI_Model {
         $sql = $query;
         if(count($conditions) > 0) {
             $sql .= " " . implode(' AND ', $conditions);
-            $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
+            if($filters['sort_by'] == 'none') {
+                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
+            } else if($filters['sort_by'] == 'featured') {
+                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
+            } else if($filters['sort_by'] == 'ratings_ltoh') {
+                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
+            } else if($filters['sort_by'] == 'ratings_htol') {
+                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
+            }            
         } else {
-            $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
+            if($filters['sort_by'] == 'none') {
+                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
+            } else if($filters['sort_by'] == 'featured') {
+                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
+            } else if($filters['sort_by'] == 'ratings_ltoh') {
+                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
+            } else if($filters['sort_by'] == 'ratings_htol') {
+                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
+            }               
         }
         
         $exe_query = $this->db->query($sql);                
