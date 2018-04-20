@@ -4,7 +4,7 @@ class Recipe_model extends CI_Model {
     public function newrecipe($data) {
         $this->db->query("INSERT into recipes(title,ingredients_html,preparation,ingredients,description,cover_imagepath,prep_time,cooking_time,servings,calorie_intake,spicy,food_group,cid,uid) VALUES ('" . $data['title'] . "','" . $data['html_ingredients_list'] . "','" . $data['preparation'] . "','" . $data['ingredients'] . "','" . $data['description'] . "','" . $data['cover_imagepath'] . "','" . $data['prep_time'] . "','" . $data['cooking_time'] . "','" . (int)$data['no_of_servings'] . "','" . (int)$data['calorie_intake'] . "','" . (int)$data['spiciness'] . "','" . (int)$data['food_group'] . "','" . (int)$data['cuisine'] . "','" . (int)$data['user_id'] . "')");        
 
-        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, useraccounts.username, cuisines.name as cname FROM recipes, useraccounts, cuisines where recipes.uid = " . (int)$data['user_id']. " AND recipes.uid=useraccounts.srno AND recipes.cid=cuisines.srno order by timestamp DESC LIMIT 1");
+        $query = $this->db->query("select recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.calorie_intake, recipes.servings, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, CONCAT(useraccounts.fname,' ',useraccounts.lname) as fullname, userprofile.profile_imagepath, useraccounts.username, cuisines.name as cname FROM recipes, useraccounts, cuisines where recipes.uid = " . (int)$data['user_id']. " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid=cuisines.srno order by timestamp DESC LIMIT 1");
         if($query->num_rows() > 0) {
             $result = $query->row_array();    
             if($result['cover_imagepath'] != '')
@@ -45,6 +45,13 @@ class Recipe_model extends CI_Model {
                 }                
             }
             $this->db->db_debug = $orig;
+
+            $query_upvotes = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $result['recipe_id']);
+            $result['upvotes'] = $query_upvotes->num_rows();
+            $query_replies = $this->db->query("SELECT * FROM reply WHERE rid = " . $result['recipe_id']);
+            $result['replies'] = $query_replies->num_rows();
+            $query_views = $this->db->query("SELECT * FROM views WHERE rid = " . $result['recipe_id']);
+            $result['views'] = $query_views->num_rows();
             return $result;
         }        
     }
