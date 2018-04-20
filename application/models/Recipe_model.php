@@ -346,5 +346,39 @@ class Recipe_model extends CI_Model {
         }
         return false;
     }
+
+    public function delete_recipe($data) {
+        $user_id = (int)$data['user_id'];
+        $recipe_id = (int)$data['rid'];
+
+        //get rating_id of rid
+        $query1 = $this->db->query("select srno from ratings where rid = " . $recipe_id . "");
+        if($query1->num_rows() > 0) {
+            $result1 = $query1->row_array();
+            //delete entries from ratings_per_user
+            $this->db->query("delete from ratings_per_user where rating_id = " . (int)$result1['srno'] . "");
+            
+            //delete from ratings
+            $this->db->query("delete from ratings where rid = " . $recipe_id . "");
+
+            //select cover_imagepath from recipes
+            $query2 = $this->db->query("select cover_imagepath, uid FROM recipes WHERE srno = " . $recipe_id . "");
+            if($query2->num_rows() > 0){
+                //get cover_imagepath
+                $result2 = $query2->row_array();
+                if($result2['uid'] == $user_id) {
+                    //remove recipe entry
+                    $query3 = $this->db->query("delete from recipes WHERE srno = " . $recipe_id . " and uid = " . $user_id . "");
+                    //check if cover_imagepath exists
+                    if($result2['cover_imagepath']) {
+                        unlink(FCPATH . 'userdata/' . $user_id . '/' . $result2['cover_imagepath']);
+                    }                                                                
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
 }
 

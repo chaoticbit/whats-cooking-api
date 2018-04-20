@@ -127,4 +127,19 @@ class Recipe extends CI_Controller {
             return responseWithHeader(true, []);    		                
         }
     }
+
+    public function delete_recipe() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->delete_recipe($data);    
+        if($result) {
+            return responseWithHeader(true, $result);    		                
+        } else {
+            return responseWithHeader(false, []);    		                
+        }
+    }
 }
