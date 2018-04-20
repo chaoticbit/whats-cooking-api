@@ -39,6 +39,17 @@ class Recipe extends CI_Controller {
         return responseWithHeader(true, $result);    		        
     }
 
+    public function load_more() {
+        $data = verifyRequest();
+		if(!$data) {
+			return authenticationFailedRequest();
+		}
+
+		$this->load->model('Recipe_model');
+        $result = $this->Recipe_model->load_more($data);        
+        return responseWithHeader(true, $result);    		        
+    }
+
     public function upvote() {
         $data = verifyRequest();
 		if(!$data) {
