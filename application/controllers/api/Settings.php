@@ -59,4 +59,19 @@ class Settings extends CI_Controller {
 			return responseWithHeader(false, false);    			
 		}
     }
+
+    public function delete_account($data) {
+        $data['password'] = $this->security->xss_clean($data('password'));
+        if(!strlen($data['password'])){
+            return false;
+        }
+        $data['password'] = md5($data['password']);        
+        $this->load->model('Settings_model');
+        $result = $this->Settings_model->delete_account($data);
+        if($result){
+            return responseWithHeader(true, true);
+        } else {
+            return responseWithHeader(false, false);    			
+        }
+    }
 }

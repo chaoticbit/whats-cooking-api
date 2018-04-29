@@ -35,4 +35,16 @@ class Settings_model extends CI_Model {
             return true;
         }
     }
+
+    public function delete_account($data){
+        $userid = (int)$data['user_id'];
+        $query = $this->db->query("SELECT * FROM useraccounts WHERE password='" . $data['password'] . "' AND srno = " . $userid);
+        if($query->num_rows() > 0) {
+            $query_= $this->db->query("DELETE FROM useraccounts WHERE srno=" . $userid);
+            $dir = FCPATH . 'userdata/' . $userid;
+            system('/bin/rm -rf ' . escapeshellarg($dir));
+            return true;
+        }
+        return false;
+    }
 }
