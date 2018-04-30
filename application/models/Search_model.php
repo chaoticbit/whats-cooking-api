@@ -47,9 +47,9 @@ class Search_model extends CI_Model {
         $post_ing_array = explode(',', $ingredients);
 
         if($keyword == '') {
-            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts, gallery where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.cid = cuisines.srno";
+            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, ratings.rating from recipes, cuisines, userprofile, useraccounts, ratings where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.cid = cuisines.srno and recipes.srno = ratings.rid";
         } else {
-            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno";
+            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, ratings.rating from recipes, cuisines, userprofile, useraccounts, ratings where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno and recipes.srno = ratings.rid";
         }
 
         $query = $this->db->query($get_ingredients_query);
@@ -69,7 +69,8 @@ class Search_model extends CI_Model {
                         array_push($response, array(
                             "recipe_id"=> $list_of_ingredients[$i]['srno'],
                             "title"=> $list_of_ingredients[$i]['title'],                        
-                            "ing_list"=> $list_of_ingredients[$i]['ingredients_html'],               
+                            "ingredients_html"=> $list_of_ingredients[$i]['ingredients_html'],               
+                            "ingredients"=> $list_of_ingredients[$i]['ingredients'],               
                             "cover_imagepath"=> $list_of_ingredients[$i]['cover_imagepath'],                       
                             "description"=> $list_of_ingredients[$i]['description'],                        
                             "prep_time"=> $list_of_ingredients[$i]['prep_time'],                        
@@ -82,7 +83,9 @@ class Search_model extends CI_Model {
                             "cname"=> $list_of_ingredients[$i]['cname'],                        
                             "uid"=> $list_of_ingredients[$i]['uid'],                        
                             "username"=> $list_of_ingredients[$i]['username'],                        
+                            "fullname"=> $list_of_ingredients[$i]['fullname'],                        
                             "profile_imagepath"=> $list_of_ingredients[$i]['profile_imagepath'],                   
+                            "rating"=> $list_of_ingredients[$i]['rating'],                   
                             "timestamp"=> $list_of_ingredients[$i]['timestamp'],                        
                             "time_elapsed"=> time_elapsed($list_of_ingredients[$i]['timestamp']),                 
                         ));
