@@ -43,13 +43,13 @@ class Search_model extends CI_Model {
       return !!array_intersect($needles, $haystack);
     }
 
-    public function i_search($keyword, $user_id, $ingredients, $exclude) {
+    public function i_search($keyword, $user_id, $ingredients) {
         $post_ing_array = explode(',', $ingredients);
 
         if($keyword == '') {
-            $get_ingredients_query = "select recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.cid = cuisines.srno";
+            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts, gallery where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.cid = cuisines.srno";
         } else {
-            $get_ingredients_query = "select recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno";
+            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username from recipes, cuisines, userprofile, useraccounts where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno";
         }
 
         $query = $this->db->query($get_ingredients_query);
@@ -69,6 +69,7 @@ class Search_model extends CI_Model {
                         array_push($response, array(
                             "recipe_id"=> $list_of_ingredients[$i]['srno'],
                             "title"=> $list_of_ingredients[$i]['title'],                        
+                            "ing_list"=> $list_of_ingredients[$i]['ingredients_html'],               
                             "cover_imagepath"=> $list_of_ingredients[$i]['cover_imagepath'],                       
                             "description"=> $list_of_ingredients[$i]['description'],                        
                             "prep_time"=> $list_of_ingredients[$i]['prep_time'],                        
@@ -101,6 +102,13 @@ class Search_model extends CI_Model {
                 } else {
                     $response[$i]['addedToFavourites'] = false;
                 }        
+
+                $query_gallery = $this->db->query("select gallery.path from gallery where rid = " . (int)$response[$i]['recipe_id'] . " and type = 2");
+                if($query_gallery->num_rows() > 0){
+                    $response[$i]['video'] = 'userdata/' . (int)$response[$i]['uid'] . '/' . $query_gallery->row_array()['path'];
+                } else {
+                    $response[$i]['video'] = "";
+                }                
                 
                 $query_upvotes = $this->db->query("SELECT * FROM upvotes WHERE rid = " . $response[$i]['recipe_id']);
                 $response[$i]['upvotes'] = $query_upvotes->num_rows();

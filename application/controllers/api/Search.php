@@ -24,11 +24,10 @@ class Search extends CI_Controller {
 
         $keyword = $data['keyword'];
         $userid = (int)$data['user_id'];
-        $ingredients = $data['ingredients'];
-        $exclude = $data['exclude'];
+        $ingredients = $data['ingredients'];        
         
         $this->load->model('Search_model');
-        $result = $this->Search_model->i_search($keyword, $userid, $ingredients, $exclude);
+        $result = $this->Search_model->i_search($keyword, $userid, $ingredients);
         if($result) {
             return responseWithHeader(true, $result);    		        
         } else {
