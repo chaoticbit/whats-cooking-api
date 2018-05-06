@@ -49,7 +49,7 @@ class Search_model extends CI_Model {
         if($keyword == '') {
             $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, ratings.rating from recipes, cuisines, userprofile, useraccounts, ratings where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.cid = cuisines.srno and recipes.srno = ratings.rid";
         } else {
-            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, ratings.rating from recipes, cuisines, userprofile, useraccounts, ratings where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno and recipes.srno = ratings.rid";
+            $get_ingredients_query = "select distinct recipes.*, cuisines.name as cname, userprofile.profile_imagepath, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, ratings.rating from recipes, cuisines, userprofile, useraccounts, ratings where recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno and recipes.title LIKE '%" . $keyword . "%' and recipes.cid = cuisines.srno and recipes.srno = ratings.rid";
         }
 
         $query = $this->db->query($get_ingredients_query);
@@ -132,7 +132,7 @@ class Search_model extends CI_Model {
         return false;        
     }
  
-    public function ingredientSearch($keyword, $userid, $ingredients, $exclude) {        
+    /*public function ingredientSearch($keyword, $userid, $ingredients, $exclude) {        
         /* $query = $this->db->query("SELECT distinct recipes.srno, recipes.title, recipes.ingredients from recipes, userprofile where title LIKE '%" . $keyword . "%'");
         $result = $query->result_array();
 
@@ -161,7 +161,7 @@ class Search_model extends CI_Model {
         header('Content-Type: application/json');
         die(json_encode($resp));         */
         
-        $ing = explode(',', $ingredients);                        
+        /*$ing = explode(',', $ingredients);                        
         $query2 = '';
         $result2 = '';
         $count = count($ing);
@@ -212,11 +212,11 @@ class Search_model extends CI_Model {
         $result2 = $query2->result_array();
         header('Content-Type: application/json');
         die(json_encode($result2));
-    }
+}*/
 
-    public function g_search($data, $filters) {
-        $userid = (int)$data['user_id'];
-
+    public function g_search($userid, $filters) {
+        $userid = (int)$userid;
+        
         $query = "SELECT distinct recipes.srno as recipe_id, recipes.title, recipes.description, recipes.cover_imagepath, recipes.prep_time, recipes.cooking_time, recipes.servings, recipes.calorie_intake, recipes.spicy, recipes.food_group, recipes.cid, recipes.uid, recipes.timestamp, useraccounts.username, concat(useraccounts.fname, ' ', useraccounts.lname) as fullname, userprofile.profile_imagepath, cuisines.name as cname, ratings.rating FROM recipes, useraccounts, userprofile, cuisines, ratings, weightage WHERE recipes.title LIKE '%" . $filters['key'] . "%' AND";
         $conditions = array();
 
@@ -240,28 +240,30 @@ class Search_model extends CI_Model {
         $sql = $query;
         if(count($conditions) > 0) {
             $sql .= " " . implode(' AND ', $conditions);
-            if($filters['sort_by'] == 'none') {
-                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
-            } else if($filters['sort_by'] == 'featured') {
-                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
-            } else if($filters['sort_by'] == 'ratings_ltoh') {
-                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
-            } else if($filters['sort_by'] == 'ratings_htol') {
-                $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
-            }            
+            $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
+            // if($filters['sort_by'] == 'none') {
+            //     $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
+            // } else if($filters['sort_by'] == 'featured') {
+            //     $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
+            // } else if($filters['sort_by'] == 'ratings_ltoh') {
+            //     $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
+            // } else if($filters['sort_by'] == 'ratings_htol') {
+            //     $sql .= " AND recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
+            // }            
         } else {
-            if($filters['sort_by'] == 'none') {
-                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
-            } else if($filters['sort_by'] == 'featured') {
-                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
-            } else if($filters['sort_by'] == 'ratings_ltoh') {
-                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
-            } else if($filters['sort_by'] == 'ratings_htol') {
-                $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
-            }               
+            $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";
+        //     if($filters['sort_by'] == 'none') {
+        //         $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid";    
+        //     } else if($filters['sort_by'] == 'featured') {
+        //         $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid AND recipes.srno = weightage.rid order by weight DESC";
+        //     } else if($filters['sort_by'] == 'ratings_ltoh') {
+        //         $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating ASC";
+        //     } else if($filters['sort_by'] == 'ratings_htol') {
+        //         $sql .= " recipes.uid = userprofile.uid AND userprofile.uid = useraccounts.srno AND recipes.cid = cuisines.srno AND recipes.srno = ratings.rid order by rating DESC";
+        //     }               
         }
         
-        $exe_query = $this->db->query($sql);                
+        $exe_query = $this->db->query($sql);             
         if($exe_query->num_rows() > 0) { 
             $result = $exe_query->result_array();   
             for($i=0;$i<count($result);$i++) {

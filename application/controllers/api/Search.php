@@ -51,7 +51,7 @@ class Search extends CI_Controller {
         $filters['sort_by'] = $this->security->xss_clean($this->input->get('sort_by'));
         
         $this->load->model('Search_model');
-        $result = $this->Search_model->g_search($data, $filters);
+        $result = $this->Search_model->g_search($data["user_id"], $filters);
         if($result) {
             return responseWithHeader(true, $result);    		        
         } else {
